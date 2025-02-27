@@ -53,12 +53,14 @@ class AIKnowledgeFactory:
         request = self.client.chat.completions.create(
             model='gpt-4o',
             messages=[{'role': 'user', 'content': query}],
-            tools=tools
+            tools=tools,
+            tool_choice='required'
         )
         tool_call = request.choices[0].message.tool_calls[0]
         args = json.loads(tool_call.function.arguments)
 
         collector_pointer = dispatch_collector(args['collector_key'])
+        print(f'collector implementation used: {collector_pointer.__name__}')
 
         if collector_pointer:
             collector = collector_pointer('')

@@ -23,6 +23,7 @@ class CLIParser:
         if not args.query:
             user_query = read_stdin_stream()
 
+        print(user_query)
         done = Event()
 
         spinner = Thread(target=spin, args=('thinking', done))

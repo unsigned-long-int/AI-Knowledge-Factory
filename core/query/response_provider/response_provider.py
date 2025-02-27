@@ -39,6 +39,9 @@ class ResponseProvider:
                              f'Context: {"\n".join(context for context, _ in context_matrix)}')
         user_context = f'Question: {query}'
 
+        print(f'Developer Context: {developer_context}')
+        print(f'User Context: {user_context}')
+
         messages = [
             {"role": "developer", "content": developer_context},
             {"role": "user", "content": user_context}

@@ -8,7 +8,7 @@ def read_stdin_stream() -> str:
     lines: List[str] = []
 
     while True:
-        line = input('>>>')
+        line = input('>>> ')
         if not line:
             break
         lines.append(line)

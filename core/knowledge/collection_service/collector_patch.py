@@ -7,7 +7,7 @@ MOCK_LIST = ['''Rick and Morty is an American adult animated science fiction sit
              '''Gravity Falls is an American mystery comedy animated television series created by Alex Hirsch for Disney Channel and Disney XD. The series follows the adventures of Dipper Pines (Jason Ritter) and his twin sister Mabel (Kristen Schaal), who are sent to spend the summer with their great-uncle (or "Grunkle") Stan (Hirsch) in Gravity Falls, Oregon, a mysterious town full of paranormal incidents and supernatural creatures. The kids help Stan run the "Mystery Shack", the tourist trap that he owns, while also investigating the local mysteries.''']
 
 
-@append_metadata(description='contains policy information for BCG employees')
+@append_metadata(description='contains the information about Rick & Morty and Gravity Falls Cartoons')
 @dataclass
 class CollectorPatch:
     endpoint: str
