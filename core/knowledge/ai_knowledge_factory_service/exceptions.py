@@ -1,0 +1,2 @@
+class InvalidCollector(Exception):
+    pass

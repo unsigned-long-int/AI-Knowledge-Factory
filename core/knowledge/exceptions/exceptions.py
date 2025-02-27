@@ -1,0 +1,2 @@
+class MissingDatastream(Exception):
+    pass

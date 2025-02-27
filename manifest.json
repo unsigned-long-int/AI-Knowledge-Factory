@@ -1,0 +1,8 @@
+{
+    "prog_name": "AI-Knowledge-Navigator",
+    "version": "1.0.0",
+    "description": "A tool that intelligently gathers information from various sources and enriches user queries with the top N relevant background insights to improve results.",
+    "author": "Oleynikov Nikolay",
+    "license": "MIT",
+    "default_context_size": 10
+}
