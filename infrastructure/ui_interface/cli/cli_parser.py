@@ -1,4 +1,6 @@
 import argparse
+import queue
+
 from threading import Event, Thread
 from dataclasses import dataclass
 from typing import Dict, Any
@@ -23,13 +25,15 @@ class CLIParser:
         if not args.query:
             user_query = read_stdin_stream()
 
-        print(user_query)
-        done = Event()
+        progress_queue = queue.Queue()
+        progress_queue.put('providing response...')
 
-        spinner = Thread(target=spin, args=('thinking', done))
+        done = Event()
+        spinner = Thread(target=spin, args=(progress_queue, done))
         spinner.start()
 
         result = self.ai_knowledge_factory.provide_response(
+            progress_queue=progress_queue,
             query=user_query,
             context_size=args.context_size
         )

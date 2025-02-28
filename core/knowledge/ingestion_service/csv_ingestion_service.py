@@ -9,5 +9,4 @@ class CSVIngestionService:
     csv_path: Path
 
     def ingest(self, embeddings: pd.DataFrame) -> None:
-        print(embeddings)
         embeddings.to_csv(self.csv_path, index=False)

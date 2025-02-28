@@ -14,5 +14,4 @@ def read_stdin_stream() -> str:
         lines.append(line)
 
     stream = '\n'.join(lines)
-    print(f'stream saved: {stream}')
     return stream

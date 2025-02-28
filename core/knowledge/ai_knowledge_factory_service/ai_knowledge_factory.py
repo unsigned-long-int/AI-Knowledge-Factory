@@ -1,4 +1,5 @@
 import json
+import queue
 from dataclasses import dataclass
 from openai import OpenAI
 from typing import Dict, Any
@@ -20,8 +21,10 @@ class AIKnowledgeFactory:
     ingestor: IngestionServiceProtocol
     retriever: RetrievalServiceProtocol
 
-    def provide_response(self, query: str, context_size: int) -> Dict[str, Any]:
+    def provide_response(self, progress_queue: queue.Queue[str], query: str, context_size: int) -> Dict[str, Any]:
+        progress_queue.put('updating knowledge base ...')
         self._update_knowledge_base(query)
+        progress_queue.put(f'fetching top {context_size} from knowlegde base')
         return self._fetch_response(
             query=query,
             context_size=context_size
@@ -60,7 +63,6 @@ class AIKnowledgeFactory:
         args = json.loads(tool_call.function.arguments)
 
         collector_pointer = dispatch_collector(args['collector_key'])
-        print(f'collector implementation used: {collector_pointer.__name__}')
 
         if collector_pointer:
             collector = collector_pointer('')
