@@ -8,6 +8,7 @@ from core.knowledge.collection_service import CollectorProtocol
 from core.knowledge.ingestion_service import IngestionServiceProtocol
 from core.knowledge.update_orchestration_service import UpdateOrchestrationService
 from core.knowledge.retrieval_service import RetrievalServiceProtocol
+from core.knowledge.ai_knowledge_factory_service.exceptions import AIKnowledgeFactoryUpdateError, AIKnowledgeFactoryResponseError
 from core.query.context_retrieval_service import ContextRetrievalService
 from core.query.response_provider import ResponseProvider
 
@@ -24,6 +25,7 @@ class AIKnowledgeFactory:
     def provide_response(self, progress_queue: queue.Queue[str], query: str, context_size: int) -> Dict[str, Any]:
         progress_queue.put('updating knowledge base ...')
         self._update_knowledge_base(query)
+
         progress_queue.put(f'fetching top {context_size} from knowlegde base')
         return self._fetch_response(
             query=query,
@@ -53,20 +55,22 @@ class AIKnowledgeFactory:
                   }
                   }
                  ]
-        request = self.client.chat.completions.create(
-            model='gpt-4o',
-            messages=[{'role': 'user', 'content': query}],
-            tools=tools,
-            tool_choice='required'
-        )
-        tool_call = request.choices[0].message.tool_calls[0]
-        args = json.loads(tool_call.function.arguments)
+        try:
+            request = self.client.chat.completions.create(
+                model='gpt-4o',
+                messages=[{'role': 'user', 'content': query}],
+                tools=tools,
+                tool_choice='required'
+            )
+            tool_call = request.choices[0].message.tool_calls[0]
+            args = json.loads(tool_call.function.arguments)
 
-        collector_pointer = dispatch_collector(args['collector_key'])
+            collector_pointer = dispatch_collector(args['collector_key'])
 
-        if collector_pointer:
             collector = collector_pointer('')
             self._orchestrate_knowledge_update(collector)
+        except Exception as e:
+            raise AIKnowledgeFactoryUpdateError from e
 
     def _orchestrate_knowledge_update(self, collector: CollectorProtocol) -> None:
         update_orchestration_service = UpdateOrchestrationService(
@@ -78,15 +82,18 @@ class AIKnowledgeFactory:
         update_orchestration_service.run_pipeline()
 
     def _fetch_response(self, query: str, context_size: int) -> Dict[str, Any]:
-        context_retriever = ContextRetrievalService(
-            retrieval_service=self.retriever
-        )
-        response_provider = ResponseProvider(
-            client=self.client,
-            context_retrieval_service=context_retriever
-        )
+        try:
+            context_retriever = ContextRetrievalService(
+                retrieval_service=self.retriever
+            )
+            response_provider = ResponseProvider(
+                client=self.client,
+                context_retrieval_service=context_retriever
+            )
 
-        return response_provider.provide_response(
-            query=query,
-            context_size=context_size
-        )
+            return response_provider.provide_response(
+                query=query,
+                context_size=context_size
+            )
+        except Exception as e:
+            raise AIKnowledgeFactoryResponseError from e

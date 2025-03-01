@@ -6,13 +6,16 @@ from core.knowledge.collection_service import (
     CollectorPatch
 )
 
-from .exceptions import InvalidCollector
+from .exceptions import InvalidCollector, NonRegisteredCollector
 
 
 class CollectorRegistryMeta(type):
     _registry: Dict[str, Type[CollectorProtocol]] = {}
 
     def __getitem__(cls, key: str) -> Optional[Type[CollectorProtocol]]:
+        if key not in cls._registry:
+            message = f'collector key: {key} is not found in _registry'
+            raise NonRegisteredCollector('collector key')
         return cls._registry.get(key)
 
     def __repr__(cls) -> str:

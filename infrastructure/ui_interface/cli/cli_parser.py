@@ -5,7 +5,14 @@ from threading import Event, Thread
 from dataclasses import dataclass
 from typing import Dict, Any
 
-from core.knowledge.ai_knowledge_factory_service import AIKnowledgeFactory
+from core.knowledge.ai_knowledge_factory_service import (
+    AIKnowledgeFactory,
+    AIKnowledgeFactoryUpdateError,
+    AIKnowledgeFactoryResponseError
+)
+from infrastructure.event_orchestration_service.event_orchestrator import EventOrchestrator
+from infrastructure.event_orchestration_service.events import events
+
 from .loading_spinner import spin
 from .stdin_streamer import read_stdin_stream
 
@@ -17,7 +24,7 @@ class CLIParser:
     description: str
     default_context_size: int
 
-    def process_query(self) -> Dict[str, Any]:
+    def process_query(self, event_orchestrator: EventOrchestrator) -> Dict[str, Any]:
         parser = self._setup_parser()
         args = parser.parse_args()
         user_query = args.query
@@ -31,15 +38,19 @@ class CLIParser:
         done = Event()
         spinner = Thread(target=spin, args=(progress_queue, done))
         spinner.start()
-
-        result = self.ai_knowledge_factory.provide_response(
-            progress_queue=progress_queue,
-            query=user_query,
-            context_size=args.context_size
-        )
-        done.set()
-        spinner.join()
-        return result
+        try:
+            result = self.ai_knowledge_factory.provide_response(
+                progress_queue=progress_queue,
+                query=user_query,
+                context_size=args.context_size
+            )
+            return result
+        except (AIKnowledgeFactoryResponseError, AIKnowledgeFactoryUpdateError) as e:
+            event = events.AIFactoryFailedProvidingResponse(str(e))
+            event_orchestrator.queue.append(event)
+        finally:
+            done.set()
+            spinner.join()
 
     def _setup_parser(self) -> argparse.ArgumentParser:
         parser = argparse.ArgumentParser(

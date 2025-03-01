@@ -12,6 +12,11 @@ class OpenAICredentialsLoadFailed(Event):
 
 
 @dataclass(frozen=True)
+class OpenAIClientLoadFailed(Event):
+    pass
+
+
+@dataclass(frozen=True)
 class ManifestNotFound(Event):
     pass
 
@@ -28,4 +33,9 @@ class MissingManifestItemsEncountered(Event):
 
 @dataclass(frozen=True)
 class ManifestGenerationFailed(Event):
+    pass
+
+
+@dataclass(frozen=True)
+class AIFactoryFailedProvidingResponse(Event):
     pass

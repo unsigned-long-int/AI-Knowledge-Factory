@@ -5,7 +5,7 @@ from openai import OpenAI
 from infrastructure.embedding_generation_service import EmbeddingGenerator
 from core.knowledge.collection_service import CollectorProtocol
 from core.knowledge.ingestion_service import IngestionServiceProtocol
-from core.knowledge.exceptions import MissingDatastream
+from .exceptions import MissingDatastream
 
 
 @dataclass

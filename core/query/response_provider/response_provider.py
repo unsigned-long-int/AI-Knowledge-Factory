@@ -8,6 +8,8 @@ from typing import Dict, List, Any
 from infrastructure.embedding_generation_service import EmbeddingGenerator
 from core.query.context_retrieval_service import ContextRetrievalService
 
+from .exceptions import ResponseProviderError
+
 
 @dataclass
 class ResponseProvider:
@@ -17,12 +19,15 @@ class ResponseProvider:
     def provide_response(self, query: str, context_size: int) -> Dict[str, Any]:
         messages = self._generate_messages(query, context_size)
 
-        response = self.client.chat.completions.create(
-            model='gpt-4o',
-            messages=messages
-        )
+        try:
+            response = self.client.chat.completions.create(
+                model='gpt-4o',
+                messages=messages
+            )
 
-        return response
+            return response
+        except Exception as e:
+            raise ResponseProviderError from e
 
     def _generate_messages(self, query: str, context_size: int) -> List[Dict[str, str]]:
         embeddings_generator = EmbeddingGenerator(

@@ -10,10 +10,12 @@ from infrastructure.event_orchestration_service.event_orchestrator import EventO
 
 EVENT_HANDLERS: Dict[Type[events.Event], List[Callable]] = {
     events.OpenAICredentialsLoadFailed: [log_error],
+    events.OpenAIClientLoadFailed: [log_error],
     events.ManifestNotFound: [log_error],
     events.ManifestDecodingFailed: [log_error],
     events.MissingManifestItemsEncountered: [log_error],
-    events.ManifestGenerationFailed: [log_error]
+    events.ManifestGenerationFailed: [log_error],
+    events.AIFactoryFailedProvidingResponse: [log_error]
 }
 
 
@@ -24,5 +26,5 @@ def handle_event(event: events.Event, event_orchestrator: EventOrchestrator) -> 
         handlers = EVENT_HANDLERS[type(event)]
 
         for handler in handlers:
-            handler(envent=event, event_orchestrator=event_orchestrator)
+            handler(event=event, event_orchestrator=event_orchestrator)
             queue.extend(event_orchestrator.collect_new_events())
