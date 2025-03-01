@@ -8,7 +8,9 @@ from typing import Dict, List, Any
 from infrastructure.embedding_generation_service import EmbeddingGenerator
 from core.query.context_retrieval_service import ContextRetrievalService
 
-from .exceptions import ResponseProviderError
+
+class ResponseProviderError(Exception):
+    pass
 
 
 @dataclass

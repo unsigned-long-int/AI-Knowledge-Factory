@@ -15,7 +15,9 @@ EVENT_HANDLERS: Dict[Type[events.Event], List[Callable]] = {
     events.ManifestDecodingFailed: [log_error],
     events.MissingManifestItemsEncountered: [log_error],
     events.ManifestGenerationFailed: [log_error],
-    events.AIFactoryFailedProvidingResponse: [log_error]
+    events.CollectorInvokeFailed: [log_error],
+    events.ResponseFetchingFailed: [log_error],
+    events.AIFactoryGenericExceptionEncountered: [log_error]
 }
 
 

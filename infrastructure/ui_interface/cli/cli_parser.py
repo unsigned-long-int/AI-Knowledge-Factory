@@ -7,9 +7,10 @@ from typing import Dict, Any
 
 from core.knowledge.ai_knowledge_factory_service import (
     AIKnowledgeFactory,
-    AIKnowledgeFactoryUpdateError,
-    AIKnowledgeFactoryResponseError
+    InvalidCollector,
+    NonRegisteredCollector
 )
+from core.query.response_provider import ResponseProviderError
 from infrastructure.event_orchestration_service.event_orchestrator import EventOrchestrator
 from infrastructure.event_orchestration_service.events import events
 
@@ -24,7 +25,7 @@ class CLIParser:
     description: str
     default_context_size: int
 
-    def process_query(self, event_orchestrator: EventOrchestrator) -> Dict[str, Any]:
+    def process_query(self, event_orchestrator: EventOrchestrator) -> None:
         parser = self._setup_parser()
         args = parser.parse_args()
         user_query = args.query
@@ -44,9 +45,15 @@ class CLIParser:
                 query=user_query,
                 context_size=args.context_size
             )
-            return result
-        except (AIKnowledgeFactoryResponseError, AIKnowledgeFactoryUpdateError) as e:
-            event = events.AIFactoryFailedProvidingResponse(str(e))
+            print(result.choices[0].message)
+        except (InvalidCollector, NonRegisteredCollector) as e:
+            event = events.CollectorInvokeFailed(str(e))
+            event_orchestrator.queue.append(event)
+        except ResponseProviderError as e:
+            event = events.ResponseFetchingFailed(str(e))
+            event_orchestrator.queue.append(event)
+        except Exception as e:
+            event = events.AIFactoryGenericExceptionEncountered(str(e))
             event_orchestrator.queue.append(event)
         finally:
             done.set()

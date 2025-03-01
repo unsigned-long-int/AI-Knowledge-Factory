@@ -17,14 +17,11 @@ from core.knowledge.ai_knowledge_factory_service import AIKnowledgeFactory
 def main() -> None:
     setup_logger()
     event_orchestrator = EventOrchestrator()
+
     manifest = load_manifest(event_orchestrator)
-
     client = load_open_ai_client(event_orchestrator)
-
     ingestor = CSVIngestionService(csv_path='./repositories/base.csv')
-    retriever = CSVRetrievalService(
-        csv_path=Path('./repositories/base.csv')
-    )
+    retriever = CSVRetrievalService(csv_path=Path('./repositories/base.csv'))
 
     ai_knowledge_factory = AIKnowledgeFactory(
         client=client,
@@ -39,7 +36,7 @@ def main() -> None:
         default_context_size=manifest.default_context_size
     )
 
-    print(cli_parser.process_query(event_orchestrator))
+    cli_parser.process_query(event_orchestrator)
 
     if event_orchestrator.queue:
         handle_event(event=event_orchestrator.queue.pop(0),

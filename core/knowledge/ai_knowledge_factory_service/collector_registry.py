@@ -6,7 +6,13 @@ from core.knowledge.collection_service import (
     CollectorPatch
 )
 
-from .exceptions import InvalidCollector, NonRegisteredCollector
+
+class InvalidCollector(Exception):
+    pass
+
+
+class NonRegisteredCollector(Exception):
+    pass
 
 
 class CollectorRegistryMeta(type):

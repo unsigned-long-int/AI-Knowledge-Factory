@@ -1,2 +1,2 @@
 from .ai_knowledge_factory import AIKnowledgeFactory
-from .exceptions import AIKnowledgeFactoryUpdateError, AIKnowledgeFactoryResponseError
+from .collector_registry import InvalidCollector, NonRegisteredCollector

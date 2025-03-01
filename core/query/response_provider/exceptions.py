@@ -1,2 +1,0 @@
-class ResponseProviderError(Exception):
-    pass

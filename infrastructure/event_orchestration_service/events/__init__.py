@@ -6,5 +6,7 @@ from .events import (
     ManifestDecodingFailed,
     MissingManifestItemsEncountered,
     ManifestGenerationFailed,
-    AIFactoryFailedProvidingResponse
+    CollectorInvokeFailed,
+    ResponseFetchingFailed,
+    AIFactoryGenericExceptionEncountered
 )

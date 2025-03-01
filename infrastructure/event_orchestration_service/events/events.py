@@ -37,5 +37,15 @@ class ManifestGenerationFailed(Event):
 
 
 @dataclass(frozen=True)
-class AIFactoryFailedProvidingResponse(Event):
+class CollectorInvokeFailed(Event):
+    pass
+
+
+@dataclass(frozen=True)
+class ResponseFetchingFailed(Event):
+    pass
+
+
+@dataclass(frozen=True)
+class AIFactoryGenericExceptionEncountered(Event):
     pass
