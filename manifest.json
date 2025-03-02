@@ -3,6 +3,6 @@
     "version": "1.0.0",
     "description": "A tool that intelligently gathers information from various sources and enriches user queries with the top N relevant background insights to improve results.",
     "author": "Oleynikov Nikolay",
-    "license": "MIT",
+    "license": "Apache License 2.0",
     "default_context_size": 10
 }
